@@ -6,9 +6,29 @@ const { sql } = require('@vercel/postgres');
 const bodyParser = require('body-parser');
 const path = require('path');
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
+const nunjucks = require('nunjucks');
 
 
 app.use(express.static('public'));
+
+nunjucks.configure('views', {
+    autoescape: true,
+    express: app,
+  });
+  
+  app.use((req, res, next) => {
+    const host = req.headers.host; // e.g., subdomain.example.com
+    const subdomain = host.split('.')[0]; // Get the subdomain part
+  
+    // Validate subdomain (you can replace this logic with your validation)
+    if (subdomain === 'www') {
+      return res.status(404).send('Not Found');
+    }
+  
+    req.subdomain = subdomain; // Store subdomain in the request object
+    next();
+  });
+  
 
 app.get('/', function (req, res) {
 	res.sendFile(path.join(__dirname, '..', 'components', 'home.htm'));
