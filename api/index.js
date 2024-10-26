@@ -7,7 +7,6 @@ const nunjucks = require('nunjucks');
 const { sql } = require('@vercel/postgres');
 const path = require('path');
 
-// Import the dashboard router
 const dashboardRouter = require('./routes/dashboard');
 
 app.use(express.static('public'));
