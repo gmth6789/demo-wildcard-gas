@@ -15,7 +15,7 @@ async function createDomainsTable() {
     `;
 
     try {
-        // Execute the SQL query
+        // Directly use sql`query` instead of sql`${query}`
         const result = await sql` ${query} `;
         console.log("Table created successfully:", result);
     } catch (error) {
