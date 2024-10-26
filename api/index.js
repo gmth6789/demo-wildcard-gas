@@ -13,7 +13,7 @@ const dashboardRouter = require('./routes/dashboard');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-nunjucks.configure(path.join(__dirname, 'views'), { 
+nunjucks.configure(path.join(__dirname, '..', 'views'), { 
   autoescape: true,
   express: app,
 });
