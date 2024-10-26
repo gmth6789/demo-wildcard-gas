@@ -1,25 +1,42 @@
 const { sql } = require('@vercel/postgres');
 
-require('dotenv').config();
-
 async function createDomainsTable() {
-    const query = `
+    const createTableQuery = `
         CREATE TABLE IF NOT EXISTS domains (
             id SERIAL PRIMARY KEY,
             domain_name VARCHAR(255) NOT NULL UNIQUE,
             site_id INT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE
         );
     `;
 
+    const createTriggerQuery = `
+        CREATE OR REPLACE FUNCTION update_updated_at_column()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.updated_at = CURRENT_TIMESTAMP;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE TRIGGER update_domains_updated_at
+        BEFORE UPDATE ON domains
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    `;
+
     try {
-        // Execute the SQL query
-        const result = await sql` ${query} `;
-        console.log("Table created successfully:", result);
+        // Execute the table creation query
+        await sql`${createTableQuery}`;
+        console.log("Table created successfully.");
+
+        // Execute the trigger creation query
+        await sql`${createTriggerQuery}`;
+        console.log("Trigger created successfully.");
     } catch (error) {
-        console.error("Error creating table:", error);
+        console.error("Error creating table or trigger:", error);
     }
 }
 

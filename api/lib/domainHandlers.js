@@ -1,5 +1,8 @@
 const fetch = require('node-fetch');
 
+require('dotenv').config();
+
+
 // Add domain to a Vercel project
 async function addDomainToVercel(domain) {
   const response = await fetch(
